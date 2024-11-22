@@ -10,6 +10,9 @@ public class HelloControleur {
 
     @GetMapping
     public String direHello(){
-        return "Hello";
+        HelloService helloService = new HelloService();
+        return helloService.salutations();
     }
+
+
 }
