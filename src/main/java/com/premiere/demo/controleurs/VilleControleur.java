@@ -1,4 +1,4 @@
-package com.premiere.demo.entites.controleurs;
+package com.premiere.demo.controleurs;
 
 import com.premiere.demo.entites.Ville;
 import com.premiere.demo.services.VilleService;
@@ -28,38 +28,35 @@ public class VilleControleur {
     @GetMapping
     public List<Ville> getVilles() {
 
-        return villeService.getListVilles();
+        //return villeService.getListVilles();
+        return villeService.extractVilles();
     }
 
     @GetMapping(path = "/{id}")
     public Ville getVille(@PathVariable int id) {
 
-        return villeService.trouverParId(id);
+        //return villeService.trouverParId(id);
+        return villeService.extractVille(id);
     }
 
 
     @PostMapping
     public ResponseEntity<String> insertVilles(@Valid @RequestBody Ville ville) {
-        boolean exist = villeService.getListVilles().stream().anyMatch(ville1 -> ville1.getNom().equals(ville.getNom()));
+        villeService.insertVille(ville);
 
-        if (exist) {
-            return ResponseEntity.badRequest().body("La ville existe déjà");
-        }
-
-        int size = villeService.getListVilles().size();
-        ville.setId(size);
-        villeService.ajouterVille(ville);
         return ResponseEntity.ok("Ville insérée avec succès");
     }
 
 
     @PutMapping
-    public ResponseEntity<String> modifierVille(@Valid @RequestBody Ville villeModifie, BindingResult result) {
+    public ResponseEntity<String> modifierVille(@Valid @RequestBody Ville villeModifie) {
 
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body("Problème de validation des contraintes !");
-        }
-        if (villeService.miseAJour(villeModifie)) {
+
+        //Optional<Ville> existe = villeService.extractVilles().stream().filter(ville -> ville.getNom().equals(villeModifie.getNom())).findFirst();
+
+
+        if (villeService.extractVilleParNom(villeModifie)!= null) {
+            villeService.modifierVille(villeModifie);
             return ResponseEntity.ok("Reussi !");
         }
 
@@ -67,11 +64,15 @@ public class VilleControleur {
             return ResponseEntity.badRequest().body("Mise à jour a echouée");
         }
 
+
+
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> supprimerVille(@PathVariable int id) {
-        if (villeService.supprimer(id)) {
+
+        if (villeService.extractVille(id) != null) {
+            villeService.supprimerVille(id);
             return ResponseEntity.ok("Suppression reussi !");
         }
 
