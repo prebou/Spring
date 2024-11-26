@@ -1,23 +1,57 @@
 package com.premiere.demo.services;
 
+import com.premiere.demo.dao.VilleDao;
 import com.premiere.demo.entites.Ville;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class VilleService {
 
-   List<Ville> listVilles = new ArrayList<>(Arrays.asList(new Ville("Paris",2133111), new Ville("Marseille", 873076), new Ville("Lyon", 522250)));
-//    Ville paris = new Ville("Paris",2_087_600);
-//    Ville colombes = new Ville("Colombes", 88_850);
+    @Autowired
+    private VilleDao villeDao;
 
-    public VilleService(){
+    private List<Ville> listVilles;//= new ArrayList<>(Arrays.asList(new Ville("Paris",2133111), new Ville("Marseille", 873076), new Ville("Lyon", 522250)));
 
+    public VilleService() {
+
+    }
+
+    public List<Ville> extractVilles() {
+        return villeDao.extractVilles();
+    }
+
+    public Ville extractVille(int id) {
+        Ville ville = villeDao.extractVilles().stream().findFirst().filter(ville1 -> ville1.getId() == id).orElse(null);
+        return ville;
+    }
+
+//    private Ville extractVille(String name) {
+//        Ville result = this.listVilles.stream().filter(element -> name.equals(element.getNom())).findAny().orElse(null);
+//        return result;
+//    }
+
+    public List<Ville> insertVille(Ville ville) {
+        villeDao.insertVille(ville);
+        return villeDao.extractVilles();
+    }
+
+    public List<Ville> modifierVille(Ville villeModifiee) {
+        villeDao.updateVille(villeModifiee);
+
+        return villeDao.extractVilles();
+    }
+
+    public List<Ville> supprimerVille(int idVille) {
+        villeDao.deleteVille(idVille);
+        return villeDao.extractVilles();
+    }
+
+    public Ville extractVilleParNom(Ville ville) {
+        Ville v = extractVilles().stream().filter(ville1 -> ville1.getNom().equals(ville.getNom())).findFirst().orElse(null);
+        return v;
     }
 
     /**
@@ -31,16 +65,16 @@ public class VilleService {
 
     public boolean ajouterVille(Ville ville) {
         Ville resultat = trouverParNom(ville.getNom());
-        if (resultat != null){
+        if (resultat != null) {
             return false;
         }
         this.listVilles.add(ville);
         return true;
     }
 
-    public boolean miseAJour(Ville ville){
+    public boolean miseAJour(Ville ville) {
         Ville ville1 = trouverParId(ville.getId());
-        if (ville1 != null){
+        if (ville1 != null) {
             ville1.setNom(ville.getNom());
             ville1.setNbHabitants(ville.getNbHabitants());
             return true;
@@ -48,9 +82,9 @@ public class VilleService {
         return false;
     }
 
-    public boolean supprimer(int id){
+    public boolean supprimer(int id) {
         Ville ville = trouverParId(id);
-        if (ville != null){
+        if (ville != null) {
             listVilles.remove(ville);
             return true;
         }
